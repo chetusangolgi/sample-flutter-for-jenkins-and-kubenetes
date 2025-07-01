@@ -15,27 +15,33 @@ pipeline {
 
 stage('Debug: Check Flutter & Git') {
     steps {
+        // This block runs commands using PowerShell
         powershell '''
             Write-Host "==== Checking Flutter Version ===="
             try {
-                # Use the call operator (&) to safely execute the command
-                # and capture its output to a variable.
-                $flutterOutput = & flutter --version
-                Write-Host "Flutter version command executed successfully."
-                # Print the captured output
-                Write-Host $flutterOutput
+                # Execute the flutter command.
+                # We pipe the output to Out-Null because we only care about the exit code for now.
+                & flutter --version | Out-Null
+
+                # Check the exit code of the last command. A non-zero code means error.
+                if ($LASTEXITCODE -ne 0) {
+                    # Manually throw an error to trigger the catch block.
+                    throw "Flutter command failed with exit code $LASTEXITCODE. The original error likely occurred before this message."
+                }
+
+                Write-Host "✅ Flutter command executed successfully."
+                # Now run it again to print the version in the log
+                flutter --version
+
             } catch {
-                # If an error occurs, print the detailed PowerShell error object
-                Write-Host "An error occurred while executing flutter --version:"
-                Write-Host $_.Exception.ToString()
-                Write-Host "Script stack trace:"
-                Write-Host $_.ScriptStackTrace
+                Write-Host "❌ An error occurred while executing flutter --version:"
+                Write-Host $_
                 exit 1
             }
-
-            Write-Host "==== Checking Git Version ===="
-            bat 'git --version'
         '''
+        // This block runs a command using Windows Batch
+        bat 'echo "==== Checking Git Version ===="'
+        bat 'git --version'
     }
 }
 
