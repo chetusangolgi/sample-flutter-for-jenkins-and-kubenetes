@@ -14,14 +14,29 @@ pipeline {
     }
 
 stage('Debug: Check Flutter & Git') {
-  steps {
-    powershell '''
-      Write-Host "==== Checking Flutter Version ===="
-      flutter --version > flutter_version.txt
-      Get-Content flutter_version.txt
-    '''
-    bat 'git --version'
-  }
+    steps {
+        powershell '''
+            Write-Host "==== Checking Flutter Version ===="
+            try {
+                # Use the call operator (&) to safely execute the command
+                # and capture its output to a variable.
+                $flutterOutput = & flutter --version
+                Write-Host "Flutter version command executed successfully."
+                # Print the captured output
+                Write-Host $flutterOutput
+            } catch {
+                # If an error occurs, print the detailed PowerShell error object
+                Write-Host "An error occurred while executing flutter --version:"
+                Write-Host $_.Exception.ToString()
+                Write-Host "Script stack trace:"
+                Write-Host $_.ScriptStackTrace
+                exit 1
+            }
+
+            Write-Host "==== Checking Git Version ===="
+            bat 'git --version'
+        '''
+    }
 }
 
 
