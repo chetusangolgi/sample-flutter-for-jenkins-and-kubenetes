@@ -15,26 +15,26 @@ pipeline {
 
     stage('Flutter Build') {
       steps {
-        sh 'flutter pub get'
-        sh 'flutter build web'
+        bat 'flutter pub get'
+        bat 'flutter build web'
       }
     }
 
     stage('Docker Build') {
       steps {
-        sh "docker build -t $IMAGE_NAME ."
+        bat "docker build -t %IMAGE_NAME% ."
       }
     }
 
     stage('Run Docker Container') {
       steps {
-        sh "docker run -d --rm -p $PORT:80 --name flutter_web_instance $IMAGE_NAME"
+        bat "docker run -d --rm -p %PORT%:80 --name flutter_web_instance %IMAGE_NAME%"
       }
     }
 
     stage('Success Info') {
       steps {
-        echo "🎉 App is running at http://localhost:$PORT"
+        echo "🎉 App is running at http://localhost:%PORT%"
       }
     }
   }
