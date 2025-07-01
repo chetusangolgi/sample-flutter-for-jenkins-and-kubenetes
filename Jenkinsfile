@@ -13,11 +13,12 @@ pipeline {
       }
     }
 
-    stage('Debug: Check Flutter & Git') {
+stage('Debug: Check Flutter & Git') {
   steps {
     powershell '''
       Write-Host "==== Checking Flutter Version ===="
-      flutter --version
+      flutter --version > flutter_version.txt
+      Get-Content flutter_version.txt
     '''
     bat 'git --version'
   }
