@@ -14,16 +14,15 @@ pipeline {
     }
 
     stage('Debug: Check Flutter & Git') {
-      steps {
-        bat '''
-          @echo off
-          echo ==== Checking Flutter Version ====
-          flutter --version
-          exit /b 0
-        '''
-        bat 'git --version'
-      }
-    }
+  steps {
+    powershell '''
+      Write-Host "==== Checking Flutter Version ===="
+      flutter --version
+    '''
+    bat 'git --version'
+  }
+}
+
 
     stage('Flutter Build') {
       steps {
